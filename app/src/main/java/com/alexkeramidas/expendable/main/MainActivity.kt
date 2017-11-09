@@ -1,55 +1,103 @@
 package com.alexkeramidas.expendable.main
 
+import android.Manifest
+import android.accounts.AccountManager
 import android.app.Activity
+import android.app.Fragment
+import android.app.ProgressDialog
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.os.AsyncTask
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
-import android.support.v4.view.GravityCompat
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
+import android.text.TextUtils
+import android.text.method.ScrollingMovementMethod
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
+import android.widget.TextView
 import com.alexkeramidas.expendable.R
-import com.alexkeramidas.expendable.application.ExpendableApplication
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
+import com.alexkeramidas.expendable.application.ActivityDependency
+import com.alexkeramidas.expendable.application.ExpendableApplicationDependency
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.api.client.extensions.android.http.AndroidHttp
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
+import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.client.util.ExponentialBackOff
+import com.google.api.services.sheets.v4.SheetsScopes
+import dagger.android.AndroidInjection
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.DaggerAppCompatActivity
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.EasyPermissions
+import java.util.*
+import javax.inject.Inject
 
 
-class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*/, NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : DaggerAppCompatActivity(), EasyPermissions.PermissionCallbacks, NavigationView.OnNavigationItemSelectedListener {
+    /**
+     * Injections
+     */
 
-    val Activity.app: ExpendableApplication
-        get() = application as ExpendableApplication
+    @Inject
+    lateinit var expendableAppDependency: ExpendableApplicationDependency
 
-    val component by lazy {
-        app.component.plus(MainModule(this))
+    @Inject
+    lateinit var activityDependency: ActivityDependency
+
+    @Inject
+    lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
+
+    override fun fragmentInjector(): AndroidInjector<Fragment> {
+        return fragmentInjector
     }
 
+    lateinit var mCredential: GoogleAccountCredential
+    private var mOutputText: TextView? = null
+    private var mCallApiButton: Button? = null
+    lateinit var mProgress: ProgressDialog
+    var scopes = mutableListOf<String>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        component.inject(this)
-        setSupportActionBar(toolbar)
+    val REQUEST_ACCOUNT_PICKER = 1000
+    val REQUEST_AUTHORIZATION = 1001
+    val REQUEST_GOOGLE_PLAY_SERVICES = 1002
+    val REQUEST_PERMISSION_GET_ACCOUNTS = 1003
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
+    private val BUTTON_TEXT = "Call Google Sheets API"
+    private val PREF_ACCOUNT_NAME = "accountName"
+    private val SCOPES = arrayOf(SheetsScopes.SPREADSHEETS)
 
-        val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
-        toggle.syncState()
 
-        nav_view.setNavigationItemSelectedListener(this)
-    }
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContentView(R.layout.activity_main)
+//        component.inject(this)
+//        setSupportActionBar(toolbar)
+//
+//        fab.setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show()
+//        }
+//
+//        val toggle = ActionBarDrawerToggle(
+//                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+//        drawer_layout.addDrawerListener(toggle)
+//        toggle.syncState()
+//
+//        nav_view.setNavigationItemSelectedListener(this)
+//    }
 
     override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+//        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+//            drawer_layout.closeDrawer(GravityCompat.START)
+//        } else {
+//            super.onBackPressed()
+//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -91,24 +139,10 @@ class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*
             }
         }
 
-        drawer_layout.closeDrawer(GravityCompat.START)
+//        drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
 
-/*    lateinit var mCredential: GoogleAccountCredential
-    private var mOutputText: TextView? = null
-    private var mCallApiButton: Button? = null
-    lateinit var mProgress: ProgressDialog
-    var scopes = mutableListOf<String>()
-
-    val REQUEST_ACCOUNT_PICKER = 1000
-    val REQUEST_AUTHORIZATION = 1001
-    val REQUEST_GOOGLE_PLAY_SERVICES = 1002
-    val REQUEST_PERMISSION_GET_ACCOUNTS = 1003
-
-    private val BUTTON_TEXT = "Call Google Sheets API"
-    private val PREF_ACCOUNT_NAME = "accountName"
-    private val SCOPES = arrayOf(SheetsScopes.SPREADSHEETS_READONLY)
 
     /**
      * Create the main activity.
@@ -116,17 +150,23 @@ class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val activityLayout = LinearLayout(this)
-        val lp = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT)
-        activityLayout.layoutParams = lp
-        activityLayout.orientation = LinearLayout.VERTICAL
-        activityLayout.setPadding(16, 16, 16, 16)
+        setContentView(R.layout.activity_main)
+        AndroidInjection.inject(this)
 
-        val tlp = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT)
+//        setSupportActionBar(toolbar)
+//
+//        fab.setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show()
+//        }
+
+//        val toggle = ActionBarDrawerToggle(
+//                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+//        drawer_layout.addDrawerListener(toggle)
+//        toggle.syncState()
+//
+//        nav_view.setNavigationItemSelectedListener(this)
+
 
         mCallApiButton = Button(this)
         mCallApiButton!!.setText(BUTTON_TEXT)
@@ -136,15 +176,14 @@ class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*
             getResultsFromApi()
             mCallApiButton!!.setEnabled(true)
         }
-        activityLayout.addView(mCallApiButton)
+
 
         mOutputText = TextView(this)
-        mOutputText!!.layoutParams = tlp
         mOutputText!!.setPadding(16, 16, 16, 16)
         mOutputText!!.isVerticalScrollBarEnabled = true
         mOutputText!!.movementMethod = ScrollingMovementMethod()
         mOutputText!!.text = "Click the \'$BUTTON_TEXT\' button to test the API."
-        activityLayout.addView(mOutputText)
+
 
         mProgress = ProgressDialog(this)
         mProgress.setMessage("Calling Google Sheets API ...")
@@ -152,7 +191,7 @@ class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*
 
         scopes.addAll(SCOPES)
 
-        setContentView(activityLayout)
+
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
                 applicationContext, scopes)
@@ -355,17 +394,19 @@ class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*
          */
         private val dataFromApi: ArrayList<String>
             get() {
-                val spreadsheetId = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
-                val range = "Class Data!A2:E"
+                val spreadsheetId = "1WmxlTChmZ0on8ujAaI0Qk7CwJbzq6gfHr3PhCgmnDx8"
+                val month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+                val year = Calendar.getInstance().get(Calendar.YEAR)
+                val range = "$month $year!G2:I"
                 val results = ArrayList<String>()
                 val response = this.mService!!.spreadsheets().values()
                         .get(spreadsheetId, range)
                         .execute()
                 val values = response.getValues()
                 if (values != null) {
-                    results.add("Name, Major")
+                    results.add("Ημεροηνία, Τύπος, Αξία")
                     for (row in values) {
-                        results.add(row[0].toString() + ", " + row[4])
+                        results.add(row[0].toString() + ", " + row[1] + ", " + row[2].toString())
                     }
                 }
                 return results
@@ -376,7 +417,7 @@ class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*
             val jsonFactory = JacksonFactory.getDefaultInstance()
             mService = com.google.api.services.sheets.v4.Sheets.Builder(
                     transport, jsonFactory, credential)
-                    .setApplicationName("Google Sheets API Android Quickstart")
+                    .setApplicationName("Expendables")
                     .build()
         }
 
@@ -406,7 +447,7 @@ class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*
             if (output == null || output.size == 0) {
                 mOutputText!!.text = "No results returned."
             } else {
-                output.add(0, "Data retrieved using the Google Sheets API:")
+                output.add(0, "Καθημερινά έξοδα μήνα")
                 mOutputText!!.text = TextUtils.join("\n", output)
             }
         }
@@ -429,5 +470,5 @@ class MainActivity : AppCompatActivity()/*, EasyPermissions.PermissionCallbacks*
                 mOutputText!!.text = "Request cancelled."
             }
         }
-    }*/
+    }
 }
