@@ -5,8 +5,6 @@ import android.app.Fragment
 import android.app.FragmentManager
 import android.os.Bundle
 import android.support.annotation.IdRes
-import android.support.annotation.Nullable
-import com.alexkeramidas.expendable.base.BaseActivityModule.Companion.ACTIVITY_FRAGMENT_MANAGER
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -16,21 +14,20 @@ import javax.inject.Named
 
 
 /**
- * com.alexkeramidas.expendable.application
+ * com.alexkeramidas.expendable.base
  * Expendable
- * Created by Alexandros Keramidas on 09/Νοε/2017.
- * Copyright (c) 2017 alex. All rights reserved
+ * Created by Alexandros Keramidas on 11/9/2017.
+ * Copyright (c) 2017 Authentiq. All rights reserved.
  */
 abstract class BaseActivity : Activity(), HasFragmentInjector {
     @Inject
-    @Named(ACTIVITY_FRAGMENT_MANAGER)
-    lateinit protected var fragmentManager: FragmentManager
-
+    @field:Named(BaseActivityModule.Companion.ACTIVITY_FRAGMENT_MANAGER)
+    lateinit var baseFragmentManager: FragmentManager
 
     @Inject
     lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
 
-    override fun onCreate(@Nullable savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
     }
@@ -40,7 +37,7 @@ abstract class BaseActivity : Activity(), HasFragmentInjector {
     }
 
     protected fun addFragment(@IdRes containerViewId: Int, fragment: Fragment) {
-        fragmentManager.beginTransaction()
+        baseFragmentManager.beginTransaction()
                 .add(containerViewId, fragment)
                 .commit()
     }

@@ -1,9 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2017 Vandolf Estrellado
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources>
-    <string name="app_name">Expendable</string>
+    <string name="app_name">Android Dagger ButterKnife MVP</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="example_1">Ex1: Activity with 1 Fragment</string>
+    <string name="example_2">Ex2: Activity with 2 Fragments</string>
+    <string name="example_3">Ex3: Activity with 1 Fragment with 1 child Fragment</string>
 
+    <string name="fragment">Fragment</string>
+    <string name="fragment_a">Fragment A</string>
+    <string name="fragment_b">Fragment B</string>
+    <string name="fragment_parent">Parent Fragment</string>
+    <string name="fragment_child">Child Fragment</string>
+
+    <string name="do_something">Do something</string>
     <string name="action_settings">Settings</string>
 
     <!-- TODO: Remove or change this placeholder text -->

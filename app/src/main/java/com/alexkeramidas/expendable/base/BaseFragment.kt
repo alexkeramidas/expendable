@@ -6,7 +6,6 @@ import android.app.FragmentManager
 import android.content.Context
 import android.os.Build
 import android.support.annotation.IdRes
-import com.alexkeramidas.expendable.base.BaseFragmentModule.Companion.CHILD_FRAGMENT_MANAGER
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -18,22 +17,21 @@ import javax.inject.Named
 /**
  * com.alexkeramidas.expendable.base
  * Expendable
- * Created by Alexandros Keramidas on 09/Νοε/2017.
- * Copyright (c) 2017 alex. All rights reserved
+ * Created by Alexandros Keramidas on 11/9/2017.
+ * Copyright (c) 2017 Authentiq. All rights reserved.
  */
 abstract class BaseFragment : Fragment(), HasFragmentInjector {
+    @Inject
+    lateinit var activityContext: Context
 
     @Inject
-    protected var activityContext: Context? = null
-
-    // Note that this should not be used within a child fragment.
-    @Inject
-    @Named(CHILD_FRAGMENT_MANAGER)
-    protected var childFragmentManager: FragmentManager? = null
+    @field:Named(BaseFragmentModule.Companion.CHILD_FRAGMENT_MANAGER)
+    lateinit var baseChildFragmentManager: FragmentManager
 
     @Inject
-    internal var childFragmentInjector: DispatchingAndroidInjector<Fragment>? = null
+    lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
 
+    @SuppressWarnings
     override fun onAttach(activity: Activity) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             // Perform injection here before M, L (API 22) and below because onAttach(Context)
@@ -51,13 +49,14 @@ abstract class BaseFragment : Fragment(), HasFragmentInjector {
         super.onAttach(context)
     }
 
-    override fun fragmentInjector(): AndroidInjector<Fragment>? {
+    override fun fragmentInjector(): AndroidInjector<Fragment> {
         return childFragmentInjector
     }
 
     protected fun addChildFragment(@IdRes containerViewId: Int, fragment: Fragment) {
-        childFragmentManager!!.beginTransaction()
+        baseChildFragmentManager.beginTransaction()
                 .add(containerViewId, fragment)
                 .commit()
     }
 }
+

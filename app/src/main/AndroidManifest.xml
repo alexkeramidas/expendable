@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
-        android:name=".application.ExpendableApplication"
+        android:name=".application.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".main.MainActivity"
+            android:name=".main.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -24,6 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".exampleone.activity.ExampleOneActivity"
+            android:label="@string/example_1" />
+
+        <activity
+            android:name=".exampletwo.activity.ExampleTwoActivity"
+            android:label="@string/example_2" />
+        <activity
+            android:name=".examplethree.activity.ExampleThreeActivity"
+            android:label="@string/example_3" />
     </application>
 
 </manifest>
