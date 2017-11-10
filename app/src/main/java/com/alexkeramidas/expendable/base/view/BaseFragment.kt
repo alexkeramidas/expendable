@@ -1,4 +1,4 @@
-package com.alexkeramidas.expendable.base
+package com.alexkeramidas.expendable.base.view
 
 import android.app.Activity
 import android.app.Fragment
@@ -17,14 +17,11 @@ import javax.annotation.Nullable
 import javax.inject.Inject
 import javax.inject.Named
 
-
-
-
 /**
- * com.alexkeramidas.expendable.base
+ * com.alexkeramidas.expendable.base.view
  * Expendable
- * Created by Alexandros Keramidas on 11/9/2017.
- * Copyright (c) 2017 Authentiq. All rights reserved.
+ * Created by Alexandros Keramidas on 10/Νοε/2017.
+ * Copyright (c) 2017 alex. All rights reserved
  */
 abstract class BaseFragment : Fragment(), HasFragmentInjector {
     @Inject

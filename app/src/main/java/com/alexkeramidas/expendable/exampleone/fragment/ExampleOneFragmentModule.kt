@@ -1,7 +1,7 @@
 package com.alexkeramidas.expendable.exampleone.fragment
 
 import android.app.Fragment
-import com.alexkeramidas.expendable.base.BaseFragmentModule
+import com.alexkeramidas.expendable.base.view.BaseFragmentModule
 import com.alexkeramidas.expendable.scoping.PerFragment
 import dagger.Binds
 import dagger.Module
@@ -14,10 +14,17 @@ import javax.inject.Named
  * Copyright (c) 2017 Authentiq. All rights reserved.
  */
 
-@Module(includes = arrayOf(BaseFragmentModule::class))
+@Module(includes = arrayOf(
+        BaseFragmentModule::class,
+        ExampleOneFragmentPresenterModule::class
+))
 abstract class ExampleOneFragmentModule {
     @Binds
     @Named(BaseFragmentModule.Companion.FRAGMENT)
     @PerFragment
     abstract fun fragment(exampleOneFragment: ExampleOneFragment): Fragment
+
+    @Binds
+    @PerFragment
+    abstract fun exampleOneView(exampleOneFragment: ExampleOneFragment): ExampleOneFragmentView
 }

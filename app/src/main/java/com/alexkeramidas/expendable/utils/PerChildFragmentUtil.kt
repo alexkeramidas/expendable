@@ -1,7 +1,7 @@
 package com.alexkeramidas.expendable.utils
 
 import android.app.Fragment
-import com.alexkeramidas.expendable.base.BaseChildFragmentModule
+import com.alexkeramidas.expendable.base.view.BaseChildFragmentModule
 import com.alexkeramidas.expendable.scoping.PerChildFragment
 import javax.inject.Inject
 import javax.inject.Named

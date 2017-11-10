@@ -8,11 +8,7 @@ import android.widget.TextView
 import butterknife.BindView
 import butterknife.OnClick
 import com.alexkeramidas.expendable.R
-import com.alexkeramidas.expendable.base.BaseFragment
-import com.alexkeramidas.expendable.utils.PerActivityUtil
-import com.alexkeramidas.expendable.utils.PerFragmentUtil
-import com.alexkeramidas.expendable.utils.SingletonUtil
-import javax.inject.Inject
+import com.alexkeramidas.expendable.base.view.BaseViewFragment
 
 
 /**
@@ -21,16 +17,7 @@ import javax.inject.Inject
  * Created by Alexandros Keramidas on 11/10/2017.
  * Copyright (c) 2017 Authentiq. All rights reserved.
  */
-class ExampleOneFragment : BaseFragment() {
-
-    @Inject
-    lateinit var singletonUtil: SingletonUtil
-
-    @Inject
-    lateinit var perActivityUtil: PerActivityUtil
-
-    @Inject
-    lateinit var perFragmentUtil: PerFragmentUtil
+class ExampleOneFragment : BaseViewFragment<ExampleOneFragmentPresenter>(), ExampleOneFragmentView {
 
     @BindView(R.id.some_text)
     lateinit var someText: TextView
@@ -42,13 +29,10 @@ class ExampleOneFragment : BaseFragment() {
 
     @OnClick(R.id.do_something)
     fun onDoSomethingClicked() {
-        var something = singletonUtil.doSomething()
-        something += "\n" + perActivityUtil.doSomething()
-        something += "\n" + perFragmentUtil.doSomething()
-        showSomething(something)
+        presenter.onDoSomething()
     }
 
-    private fun showSomething(something: String) {
-        someText!!.text = something
+    override fun showSomething(something: String) {
+        someText.text = something
     }
 }

@@ -8,12 +8,7 @@ import android.widget.TextView
 import butterknife.BindView
 import butterknife.OnClick
 import com.alexkeramidas.expendable.R
-import com.alexkeramidas.expendable.base.BaseFragment
-import com.alexkeramidas.expendable.utils.PerActivityUtil
-import com.alexkeramidas.expendable.utils.PerChildFragmentUtil
-import com.alexkeramidas.expendable.utils.PerFragmentUtil
-import com.alexkeramidas.expendable.utils.SingletonUtil
-import javax.inject.Inject
+import com.alexkeramidas.expendable.base.view.BaseViewFragment
 
 
 /**
@@ -22,20 +17,7 @@ import javax.inject.Inject
  * Created by Alexandros Keramidas on 10/Νοε/2017.
  * Copyright (c) 2017 alex. All rights reserved
  */
-class ExampleThreeChildFragment : BaseFragment() {
-
-    @Inject
-    lateinit var singletonUtil: SingletonUtil
-
-    @Inject
-    lateinit var perActivityUtil: PerActivityUtil
-
-    @Inject
-    lateinit var perFragmentUtil: PerFragmentUtil
-
-    @Inject
-    lateinit var perChildFragmentUtil: PerChildFragmentUtil
-
+class ExampleThreeChildFragment : BaseViewFragment<ExampleThreeChildFragmentPresenter>(), ExampleThreeChildFragmentView {
     @BindView(R.id.some_text)
     lateinit var someText: TextView
 
@@ -45,14 +27,11 @@ class ExampleThreeChildFragment : BaseFragment() {
 
     @OnClick(R.id.do_something)
     fun onDoSomethingClicked() {
-        var something = singletonUtil.doSomething()
-        something += "\n" + perActivityUtil.doSomething()
-        something += "\n" + perFragmentUtil.doSomething()
-        something += "\n" + perChildFragmentUtil.doSomething()
-        showSomething(something)
+        presenter.onDoSomething()
     }
 
-    private fun showSomething(something: String) {
-        someText!!.text = something
+    override fun showSomething(something: String) {
+        childFragmentManager.hashCode()
+        someText.text = something
     }
 }

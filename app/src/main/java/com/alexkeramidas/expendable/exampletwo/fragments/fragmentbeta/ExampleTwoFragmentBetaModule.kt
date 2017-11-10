@@ -1,8 +1,10 @@
 package com.alexkeramidas.expendable.exampletwo.activity
 
 import android.app.Fragment
-import com.alexkeramidas.expendable.base.BaseFragmentModule
+import com.alexkeramidas.expendable.base.view.BaseFragmentModule
 import com.alexkeramidas.expendable.exampletwo.fragments.fragmentbeta.ExampleTwoFragmentBeta
+import com.alexkeramidas.expendable.exampletwo.fragments.fragmentbeta.ExampleTwoFragmentBetaPresenterModule
+import com.alexkeramidas.expendable.exampletwo.fragments.fragmentbeta.ExampleTwoFragmentBetaView
 import com.alexkeramidas.expendable.scoping.PerFragment
 import dagger.Binds
 import dagger.Module
@@ -15,10 +17,17 @@ import javax.inject.Named
  * Copyright (c) 2017 alex. All rights reserved
  */
 
-@Module(includes = arrayOf(BaseFragmentModule::class))
+@Module(includes = arrayOf(
+        BaseFragmentModule::class,
+        ExampleTwoFragmentBetaPresenterModule::class
+))
 abstract class ExampleTwoFragmentBetaModule {
     @Binds
     @Named(BaseFragmentModule.Companion.FRAGMENT)
     @PerFragment
     abstract fun fragment(exampleTwoFragmentBeta: ExampleTwoFragmentBeta): Fragment
+
+    @Binds
+    @PerFragment
+    abstract fun exampleTwoFragmentBetaView(exampleTwoFragmentBeta: ExampleTwoFragmentBeta): ExampleTwoFragmentBetaView
 }

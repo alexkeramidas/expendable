@@ -1,14 +1,12 @@
 package com.alexkeramidas.expendable.main.activity
 
-import android.content.Intent
 import android.os.Bundle
 import com.alexkeramidas.expendable.R
 import com.alexkeramidas.expendable.base.BaseActivity
-import com.alexkeramidas.expendable.exampleone.activity.ExampleOneActivity
-import com.alexkeramidas.expendable.examplethree.activity.ExampleThreeActivity
-import com.alexkeramidas.expendable.exampletwo.activity.ExampleTwoActivity
 import com.alexkeramidas.expendable.main.fragments.MainFragment
 import com.alexkeramidas.expendable.main.fragments.MainFragmentListener
+import com.alexkeramidas.expendable.navigation.Navigator
+import javax.inject.Inject
 
 
 /**
@@ -18,6 +16,9 @@ import com.alexkeramidas.expendable.main.fragments.MainFragmentListener
  * Copyright (c) 2017 Authentiq. All rights reserved.
  */
 class MainActivity : BaseActivity(), MainFragmentListener {
+
+    @Inject
+    lateinit var navigator: Navigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,17 +30,14 @@ class MainActivity : BaseActivity(), MainFragmentListener {
     }
 
     override fun onExample1Clicked() {
-        val intent = Intent(this, ExampleOneActivity::class.java)
-        startActivity(intent)
+        navigator.toExample1(this)
     }
 
     override fun onExample2Clicked() {
-        val intent = Intent(this, ExampleTwoActivity::class.java)
-        startActivity(intent)
+        navigator.toExample2(this)
     }
 
     override fun onExample3Clicked() {
-        val intent = Intent(this, ExampleThreeActivity::class.java)
-        startActivity(intent)
+        navigator.toExample3(this)
     }
 }

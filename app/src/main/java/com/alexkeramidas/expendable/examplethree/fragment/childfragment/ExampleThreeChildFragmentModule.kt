@@ -1,7 +1,7 @@
 package com.alexkeramidas.expendable.examplethree.fragment.childfragment
 
 import android.app.Fragment
-import com.alexkeramidas.expendable.base.BaseChildFragmentModule
+import com.alexkeramidas.expendable.base.view.BaseChildFragmentModule
 import com.alexkeramidas.expendable.scoping.PerChildFragment
 import dagger.Binds
 import dagger.Module
@@ -14,10 +14,17 @@ import javax.inject.Named
  * Copyright (c) 2017 alex. All rights reserved
  */
 
-@Module(includes = arrayOf(BaseChildFragmentModule::class))
+@Module(includes = arrayOf(
+        BaseChildFragmentModule::class,
+        ExampleThreeChildFragmentPresenterModule::class
+))
 abstract class ExampleThreeChildFragmentModule {
     @Binds
     @Named(BaseChildFragmentModule.Companion.CHILD_FRAGMENT)
     @PerChildFragment
     abstract fun fragment(exampleThreeChildFragment: ExampleThreeChildFragment): Fragment
+
+    @Binds
+    @PerChildFragment
+    abstract fun exampleThreeChildFragmentView(exampleThreeChildFragment: ExampleThreeChildFragment): ExampleThreeChildFragmentView
 }

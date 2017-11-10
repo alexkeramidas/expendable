@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import butterknife.OnClick
 import com.alexkeramidas.expendable.R
-import com.alexkeramidas.expendable.base.BaseFragment
+import com.alexkeramidas.expendable.base.view.BaseFragment
 import javax.inject.Inject
 
 /**
